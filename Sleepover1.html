@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8'/>
+<title>Extended Sleeper & Castles Grand Tour</title>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<link rel='stylesheet' href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'/>
+<style>body{margin:0}#map{height:100vh}.leaflet-popup-content{font-size:.9rem;line-height:1.25}</style>
+<script src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'></script>
+</head>
+<body>
+<div id='map'></div>
+<script>
+const map=L.map('map').setView([49.8,9],6);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(map);
+const base='https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/';
+const green=new L.Icon({iconUrl:base+'marker-icon-green.png',shadowUrl:'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',iconSize:[25,41],iconAnchor:[12,41]});
+const red=new L.Icon({iconUrl:base+'marker-icon-red.png',shadowUrl:'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',iconSize:[25,41],iconAnchor:[12,41]});
+const blue=new L.Icon({iconUrl:base+'marker-icon-blue.png',shadowUrl:'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',iconSize:[25,41],iconAnchor:[12,41]});
+const dashed={color:'grey',dashArray:'4,4',weight:2};
+
+// itinerary stops in chronological order
+const stops=[
+ {name:'Brussels (start)',coords:[50.8503,4.3517],nights:1,desc:'Grand‑Place & Halle Gate castle‑museum.'},
+ {name:'Berlin',coords:[52.5200,13.4050],nights:2,desc:'Charlottenburg Palace, Spandau Citadel & Pfaueninsel ruins.'},
+ {name:'Dresden',coords:[51.0504,13.7373],nights:1,desc:'Royal Palace complex & baroque Old Town.'},
+ {name:'Königstein (Saxon Switzerland)',coords:[50.9186,14.0714],nights:1,desc:'Königstein hill‑fortress & Bastei Bridge views.'},
+ {name:'Prague',coords:[50.0755,14.4378],nights:2,desc:'Prague Castle & Charles Bridge sunrise.'},
+ {name:'Zurich',coords:[47.3769,8.5417],nights:1,desc:'Old‑Town stroll & quick hop to Lucerne.'},
+ {name:'Lucerne',coords:[47.0502,8.3093],nights:1,desc:'Lake steamer & Mount Rigi cog‑rail panoramas.'},
+ {name:'Montreux',coords:[46.4333,6.9116],nights:2,desc:'Lakeside promenade & Chillon Castle.'},
+ {name:'Zurich (end)',coords:[47.3769,8.5417],nights:1,desc:'Rhine Falls finale before flight.'}
+];
+
+const legs=[
+ // sleeper deal segments (orange)
+ {f:0,t:1,info:'European Sleeper ES 453: Brussels 19:22 → Berlin 06:20 • 10h58 • £34 pp',deal:true},
+ {f:4,t:5,info:'Nightjet NJ 40470: Prague 18:02 → Zurich 06:20 • 12h18 • £49 pp',deal:true},
+ // day trains (blue)
+ {f:1,t:2,info:'ICE Sprinter Berlin 09:54 → Dresden 11:08 • 1h14 • €18',deal:false},
+ {f:2,t:3,info:'S‑Bahn Dresden 08:29 → Königstein 09:05 • 0h36 • €7',deal:false},
+ {f:3,t:4,info:'EC Königstein 10:29 → Prague 12:45 • 2h16 • €15',deal:false},
+ {f:5,t:6,info:'IR Zurich HB 07:04 → Lucerne 08:00 • 0h56 • CHF 8.80',deal:false},
+ {f:6,t:7,info:'GoldenPass Express Lucerne 08:06 → Montreux 12:13 • 4h07 • CHF 39 with Saver Day Pass',deal:false},
+ {f:7,t:8,info:'IR90 Montreux 09:44 → Bern 11:14 • IC Bern 11:30 → Zurich HB 12:28 • 2h44 • CHF 30',deal:false}
+];
+
+const sidetrips=[
+ {from:[51.0504,13.7373],to:[51.1674,13.6843],name:'Moritzburg Water‑Castle'},
+ {from:[50.0755,14.4378],to:[49.9375,14.1889],name:'Karlštejn Castle'},
+ {from:[47.3769,8.5417],to:[47.6775,8.6150],name:'Rhine Falls'},
+ {from:[46.4333,6.9116],to:[46.0207,7.7491],name:'Zermatt & Gornergrat'}
+];
+
+// plot main stops
+stops.forEach((s,i)=>{
+  const icon=i===0?green:(i===stops.length-1?red:blue);
+  L.marker(s.coords,{icon}).addTo(map).bindPopup(`<b>${s.name}</b><br>${s.desc}<br><i>Stay:</i> ${s.nights} night${s.nights!==1?'s':''}`);
+});
+// plot main legs
+legs.forEach(l=>{
+  const color=l.deal?'orange':'blue';
+  L.polyline([stops[l.f].coords,stops[l.t].coords],{color,weight:4}).addTo(map).bindPopup(`<b>${stops[l.f].name} → ${stops[l.t].name}</b><br>${l.info}`);
+});
+// optional side‑trips
+sidetrips.forEach(p=>{
+  L.polyline([p.from,p.to],dashed).addTo(map).bindPopup(`<b>${p.name}</b> (optional day‑trip)`);
+  L.marker(p.to,{icon:blue}).addTo(map).bindPopup(`<b>${p.name}</b>`);
+});
+</script>
+</body>
+</html>
+
