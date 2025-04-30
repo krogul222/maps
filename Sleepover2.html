@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Amsterdam → Rhine Castles → Prague → Vienna → Paris (Dual Sleeper)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>body{margin:0}#map{height:100vh}.leaflet-popup-content{font-size:.9rem;line-height:1.25}</style>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+<div id="map"></div>
+<script>
+const map=L.map('map').setView([50.2,8.5],6);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap contributors'}).addTo(map);
+const base='https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/';
+const iconClr=c=>new L.Icon({iconUrl:base+`marker-icon-${c}.png`,shadowUrl:'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',iconSize:[25,41],iconAnchor:[12,41]});
+const startI=iconClr('green'),endI=iconClr('red'),midI=iconClr('blue');
+const dashed={color:'grey',dashArray:'4,4',weight:2};
+
+const stops=[
+  {name:'Amsterdam (start)',coords:[52.3676,4.9041],nights:1,desc:'Canals & Muiderslot castle evening side-trip.'},
+  {name:'Koblenz',coords:[50.3569,7.5889],nights:1,desc:'Rhine gorge base – cable‑car to Ehrenbreitstein; optional boat to castles.'},
+  {name:'Prague',coords:[50.0755,14.4378],nights:2,desc:'Prague Castle, Charles Bridge dawn.'},
+  {name:'Vienna',coords:[48.2082,16.3738],nights:1,desc:'Schönbrunn Palace & evening at Hofburg courtyards.'},
+  {name:'Paris (end)',coords:[48.8566,2.3522],nights:0,desc:'Louvre & Seine before flight.'}
+];
+
+const legs=[
+  {f:0,t:1,info:'ICE 125: Amsterdam Centraal 09:08 → Koblenz 13:25 (change Cologne) • 4 h 17 • €39',deal:false},
+  {f:1,t:2,info:'European Sleeper ES 453: Koblenz 19:50 → Prague hl.n. 07:39 • 11 h 49 • couchette £34 pp',deal:true},
+  {f:2,t:3,info:'Railjet RJ 256: Prague 12:12 → Vienna Hbf 15:49 • 3 h 37 • €29',deal:false},
+  {f:3,t:4,info:'Nightjet NJ 469: Vienna Hbf 19:40 → Paris Gare de l’Est 09:42 • 14 h 02 • couchette £49 pp',deal:true}
+];
+
+const extras=[
+  {from:[50.3569,7.5889],to:[50.1450,7.1660],name:'Cochem & Reichsburg Castle'},
+  {from:[50.0755,14.4378],to:[49.9375,14.1889],name:'Karlštejn Castle'},
+  {from:[48.2082,16.3738],to:[48.3998,15.5930],name:'Melk Abbey & Wachau Castles'}
+];
+
+stops.forEach((s,i)=>{
+  const ic=i===0?startI:(i===stops.length-1?endI:midI);
+  L.marker(s.coords,{icon:ic}).addTo(map)
+    .bindPopup(`<b>${s.name}</b><br>${s.desc}<br><i>Stay:</i> ${s.nights} night${s.nights!==1?'s':''}`);
+});
+
+legs.forEach(l=>{
+  const col=l.deal?'orange':'blue';
+  L.polyline([stops[l.f].coords,stops[l.t].coords],{color:col,weight:4}).addTo(map)
+    .bindPopup(`<b>${stops[l.f].name} → ${stops[l.t].name}</b><br>${l.info}`);
+});
+
+extras.forEach(e=>{
+  L.polyline([e.from,e.to],dashed).addTo(map)
+    .bindPopup(`<b>${e.name}</b> (optional)`);
+  L.marker(e.to,{icon:midI}).addTo(map)
+    .bindPopup(`<b>${e.name}</b>`);
+});
+</script>
+</body>
+</html>
+
