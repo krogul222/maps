@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>Bavaria Austria Itinerary Map v4</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+body{margin:0}
+#map{height:100vh}
+.leaflet-popup-content{font-size:.9rem;line-height:1.3}
+</style>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+<div id="map"></div>
+<script>
+const map=L.map('map').setView([47.6, 12.5],6);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap contributors'}).addTo(map);
+const iconBase='https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/';
+const green=new L.Icon({iconUrl:iconBase+'marker-icon-green.png',shadowUrl:'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',iconSize:[25,41],iconAnchor:[12,41]});
+const red=new L.Icon({iconUrl:iconBase+'marker-icon-red.png',shadowUrl:'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',iconSize:[25,41],iconAnchor:[12,41]});
+const blue=new L.Icon({iconUrl:iconBase+'marker-icon-blue.png',shadowUrl:'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',iconSize:[25,41],iconAnchor:[12,41]});
+const stops=[{"name": "Munich", "coords": [48.1351, 11.582], "nights": 2, "desc": "Bavarian capital of beer halls and baroque. Watch the Rathaus\u2011Glockenspiel at Marienplatz, cycle the English Garden and savour K\u00f6niglicher Bier\u2011g\u00e4rtner pretzels."}, {"name": "F\u00fcssen", "coords": [47.569, 10.7], "nights": 1, "desc": "Gateway to dream\u2011like Neuschwanstein and Hohenschwangau castles. Row across Alpsee or hike to Marienbr\u00fccke for the iconic mouth\u2011drop photo."}, {"name": "Salzburg", "coords": [47.8095, 13.055], "nights": 1, "desc": "Birthplace of Mozart and The Sound of Music. Baroque domes fringe the Salzach beneath Hohensalzburg Fortress; sample \u2018Nockerl\u2019 dessert downtown."}, {"name": "Hallstatt", "coords": [47.5613, 13.6481], "nights": 1, "desc": "UNESCO salt\u2011mine village clinging to a fjord\u2011like lake. Ride the funicular to the skywalk, tour 7000\u2011year\u2011old tunnels and visit the bone\u2011house ossuary."}, {"name": "Vienna", "coords": [48.2082, 16.3738], "nights": 3, "desc": "Imperial grandeur meets hip caf\u00e9s. Tour Sch\u00f6nbrunn, sip melange at Caf\u00e9 Central, hear Mozart at the Musikverein and see Klimt\u2019s *The\u202fKiss*."}, {"name": "Krems", "coords": [48.4103, 15.614], "nights": 0, "desc": "Danube wine capital. Cruise through terraced Wachau vineyards, bike to Melk Abbey and taste apricot schnapps in mediaeval lanes."}];
+const legs=[{"f": 0, "t": 1, "info": "Munich\u202fHbf 08:52 \u2192 F\u00fcssen 11:15 \u2022 2\u202fh\u202f23 \u2022 ALX Regional (Deutsche\u202fBahn / L\u00e4nderbahn) \u2022 \u20ac32 (Bayern\u2011Ticket)"}, {"f": 1, "t": 0, "info": "F\u00fcssen 18:05 \u2192 Munich\u202fHbf 20:20 \u2022 2\u202fh\u202f15 \u2022 DB Regional \u2022 included in Bayern\u2011Ticket"}, {"f": 0, "t": 2, "info": "Munich\u202fHbf 09:24 \u2192 Salzburg\u202fHbf 10:54 \u2022 1\u202fh\u202f30 \u2022 Railjet (\u00d6BB) \u2022 \u20ac19 (Sparschiene)"}, {"f": 2, "t": 3, "info": "Salzburg\u202fHbf 08:12 \u2192 Attnang\u2011Puchheim 09:14 (REX) \u00bb 09:20 \u2192 Hallstatt 10:47 (Regional) \u2022 2\u202fh\u202f35 \u2022 \u00d6BB \u2022 \u20ac9.90"}, {"f": 3, "t": 4, "info": "Hallstatt 09:35 \u2192 Vienna\u202fHbf 13:04 \u2022 3\u202fh\u202f29 \u2022 \u00d6BB InterCity \u2022 \u20ac23"}, {"f": 4, "t": 5, "info": "Vienna\u202fHbf 09:15 \u2192 Krems 10:25 \u2022 1\u202fh\u202f10 \u2022 REX (\u00d6BB) \u2022 \u20ac20"}, {"f": 5, "t": 4, "info": "Krems \u00bb Wachau boat \u2192 Melk \u2192 Vienna \u2022 1\u202fh\u202f30 boat + 1\u202fh\u202frail \u2022 DDSG / \u00d6BB \u2022 \u20ac20"}];
+stops.forEach((s,i)=>{
+  const ico=i===0?green:(i===stops.length-1?red:blue);
+  L.marker(s.coords,{icon:ico}).addTo(map)
+   .bindPopup(`<b>${s.name}</b><br>${s.desc}<br><i>Stay:</i> ${s.nights} night${s.nights!==1?'s':''}`);
+});
+legs.forEach(l=>{
+  L.polyline([stops[l.f].coords,stops[l.t].coords],{color:'green',weight:4})
+   .addTo(map)
+   .bindPopup(`<b>${stops[l.f].name} → ${stops[l.t].name}</b><br>${l.info}`);
+});
+</script>
+</body>
+</html>

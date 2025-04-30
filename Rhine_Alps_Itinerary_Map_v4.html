@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>Rhine Alps Itinerary Map v4</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+body{margin:0}
+#map{height:100vh}
+.leaflet-popup-content{font-size:.9rem;line-height:1.3}
+</style>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+<div id="map"></div>
+<script>
+const map=L.map('map').setView([48.8, 8.3],6);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap contributors'}).addTo(map);
+const iconBase='https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/';
+const green=new L.Icon({iconUrl:iconBase+'marker-icon-green.png',shadowUrl:'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',iconSize:[25,41],iconAnchor:[12,41]});
+const red=new L.Icon({iconUrl:iconBase+'marker-icon-red.png',shadowUrl:'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',iconSize:[25,41],iconAnchor:[12,41]});
+const blue=new L.Icon({iconUrl:iconBase+'marker-icon-blue.png',shadowUrl:'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',iconSize:[25,41],iconAnchor:[12,41]});
+const stops=[{"name": "Frankfurt", "coords": [50.1109, 8.6821], "nights": 1, "desc": "Germany\u2019s financial hub yet full of cosy cider taverns. Climb Main Tower for skyline views, wander the half\u2011timbered R\u00f6merplatz and stroll the river embankment museums."}, {"name": "Bingen", "coords": [49.9667, 7.8997], "nights": 0, "desc": "Entry to the UNESCO Upper Middle Rhine Valley. Snap the mid\u2011river M\u00e4useturm watch\u2011tower, taste Riesling at riverside wine bars, board the KD cruise."}, {"name": "Koblenz", "coords": [50.3569, 7.5889], "nights": 1, "desc": "Historic town at the Rhine\u2013Moselle confluence. Take the cable\u2011car over the river to Ehrenbreitstein Fortress, then sip local wine at Deutsches Eck."}, {"name": "Heidelberg", "coords": [49.3988, 8.6724], "nights": 1, "desc": "Romantic red\u2011sandstone castle ruin, cobbled Altstadt and riverfront Philosopher\u2019s Way for sunset. Largest university town in Germany."}, {"name": "Lucerne", "coords": [47.0502, 8.3093], "nights": 1, "desc": "Story\u2011book medieval bridges (Kapellbr\u00fccke), the poignant Lion Monument and steamer rides across glassy Lake Lucerne ringed by peaks."}, {"name": "Interlaken", "coords": [46.6863, 7.8632], "nights": 2, "desc": "Adventure capital between Lakes Thun & Brienz. Base for Jungfraujoch \u2018Top of Europe\u2019, Schynige Platte hike and paragliding from Harder Kulm."}, {"name": "Bern", "coords": [46.9481, 7.4474], "nights": 0, "desc": "Federal Swiss capital with UNESCO arcaded old town bending inside the Aare river. Don\u2019t miss the medieval Zytglogge clock and Bear Park."}, {"name": "Zurich", "coords": [47.3769, 8.5417], "nights": 0, "desc": "Global finance yet laid\u2011back lakeside vibe: swim in Limmat river baths, browse Kunsthaus modern art, and shop along elegant Bahnhofstrasse before flying home."}];
+const legs=[{"f": 0, "t": 1, "info": "Frankfurt\u202fHbf 09:24 \u2192 Bingen\u202f(Rhein)\u202fHbf 10:22 \u2022 0\u202fh\u202f58 \u2022 RegionalExpress (DB Regio) \u2022 \u20ac15"}, {"f": 1, "t": 2, "info": "KD Cruise Pier Bingen 11:30 \u2192 Koblenz Deutsches\u202fEck 16:10 \u2022 4\u202fh\u202f40 \u2022 KD River\u202fCruise \u2022 \u20ac42"}, {"f": 2, "t": 3, "info": "Koblenz\u202fHbf 09:13 \u2192 Heidelberg\u202fHbf 11:32 \u2022 2\u202fh\u202f19 \u2022 InterCity (DB) \u2022 \u20ac19"}, {"f": 3, "t": 4, "info": "Heidelberg\u202fHbf 08:06 \u2192 Basel\u202fSBB 10:41 (ICE, DB) \u00bb 11:04 \u2192 Lucerne 12:05 (IR, SBB) \u2022 3\u202fh\u202f59 \u2022 \u20ac37"}, {"f": 4, "t": 5, "info": "Lucerne 08:06 \u2192 Interlaken\u202fOst 10:00 \u2022 1\u202fh\u202f54 \u2022 Luzern\u2013Interlaken Express (Zentralbahn Panoramic) \u2022 CHF\u202f26"}, {"f": 5, "t": 6, "info": "Interlaken\u202fOst 09:08 \u2192 Bern 10:01 \u2022 0\u202fh\u202f53 \u2022 InterCity (SBB) \u2022 CHF\u202f13"}, {"f": 6, "t": 7, "info": "Bern 10:34 \u2192 Z\u00fcrich\u202fHB 11:28 \u2022 0\u202fh\u202f54 \u2022 InterCity (SBB) \u2022 CHF\u202f23"}];
+stops.forEach((s,i)=>{
+  const ico=i===0?green:(i===stops.length-1?red:blue);
+  L.marker(s.coords,{icon:ico}).addTo(map)
+   .bindPopup(`<b>${s.name}</b><br>${s.desc}<br><i>Stay:</i> ${s.nights} night${s.nights!==1?'s':''}`);
+});
+legs.forEach(l=>{
+  L.polyline([stops[l.f].coords,stops[l.t].coords],{color:'blue',weight:4})
+   .addTo(map)
+   .bindPopup(`<b>${stops[l.f].name} → ${stops[l.t].name}</b><br>${l.info}`);
+});
+</script>
+</body>
+</html>

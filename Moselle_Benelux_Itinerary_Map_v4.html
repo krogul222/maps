@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>Moselle Benelux Itinerary Map v4</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+body{margin:0}
+#map{height:100vh}
+.leaflet-popup-content{font-size:.9rem;line-height:1.3}
+</style>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+<div id="map"></div>
+<script>
+const map=L.map('map').setView([50.2, 6.5],6);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap contributors'}).addTo(map);
+const iconBase='https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/';
+const green=new L.Icon({iconUrl:iconBase+'marker-icon-green.png',shadowUrl:'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',iconSize:[25,41],iconAnchor:[12,41]});
+const red=new L.Icon({iconUrl:iconBase+'marker-icon-red.png',shadowUrl:'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',iconSize:[25,41],iconAnchor:[12,41]});
+const blue=new L.Icon({iconUrl:iconBase+'marker-icon-blue.png',shadowUrl:'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',iconSize:[25,41],iconAnchor:[12,41]});
+const stops=[{"name": "Luxembourg", "coords": [49.6116, 6.1319], "nights": 1, "desc": "Cliff\u2011top old town with glass elevators to Grund. Explore Bock Casemates tunnels and sample Gromperekichelcher potato fritters."}, {"name": "Vianden", "coords": [49.9353, 6.2071], "nights": 0, "desc": "Pristine medieval ch\u00e2teau reconstructed by Victor Hugo\u2019s advocacy. Ride chair\u2011lift for aerial valley views."}, {"name": "Trier", "coords": [49.7499, 6.6371], "nights": 1, "desc": "Germany\u2019s oldest city: Porta Nigra, Constantine Basilica, amphitheatre and Moselle river Riesling pubs."}, {"name": "Cochem", "coords": [50.145, 7.166], "nights": 1, "desc": "Fairy\u2011tale Reichsburg castle, half\u2011timbered Markt and riverside wine terraces. Evening torch tour highly recommended."}, {"name": "Koblenz", "coords": [50.3569, 7.5889], "nights": 1, "desc": "Stand where Rhine meets Moselle at Deutsches\u202fEck; sunset from Ehrenbreitstein reached by gondola."}, {"name": "Cologne", "coords": [50.9375, 6.9603], "nights": 1, "desc": "Soar inside the giant Gothic vaults of the Dom, wander Belgian Quarter boutiques and sip crisp K\u00f6lsch beer in a wood\u2011panelled brewery."}, {"name": "Utrecht", "coords": [52.0907, 5.1214], "nights": 1, "desc": "Two\u2011tier canals with wharf\u2011cellars turned caf\u00e9s, the 14th\u2011century Dom Tower climb, Miffy Museum for kids."}, {"name": "Amsterdam", "coords": [52.3676, 4.9041], "nights": 3, "desc": "Golden Age canal belt, Van Gogh & Rijksmuseum masterpieces, flower\u2011filled Jordaan lanes and indie bars in De\u202fPijp."}];
+const legs=[{"f": 0, "t": 1, "info": "Luxembourg Gare 09:29 \u2192 Vianden (Bus\u202f570) 11:14 \u2022 1\u202fh\u202f45 \u2022 RGTR Bus \u2022 free (Lux network)"}, {"f": 0, "t": 2, "info": "Luxembourg\u202fHbf 10:36 \u2192 Trier\u202fHbf 11:14 \u2022 0\u202fh\u202f38 \u2022 DB Regional (RE\u202f11) \u2022 \u20ac8"}, {"f": 2, "t": 3, "info": "Trier\u202fHbf 10:10 \u2192 Cochem 11:05 \u2022 0\u202fh\u202f55 \u2022 DB Regional (RB\u202f81) \u2022 \u20ac9"}, {"f": 3, "t": 4, "info": "Cochem 09:02 \u2192 Koblenz\u202fHbf 09:40 \u2022 0\u202fh\u202f38 \u2022 DB RB\u202f81 along Moselle \u2022 \u20ac7"}, {"f": 4, "t": 5, "info": "Koblenz\u202fHbf 10:02 \u2192 Cologne\u202fHbf 11:08 \u2022 1\u202fh\u202f06 \u2022 RE\u202f5 (Rhein\u2011Ruhr\u2011Express) \u2022 \u20ac11.90"}, {"f": 5, "t": 6, "info": "Cologne\u202fHbf 09:42 \u2192 Utrecht\u202fCentraal 11:55 \u2022 2\u202fh\u202f13 \u2022 ICE International (DB/NS) \u2022 \u20ac30"}, {"f": 6, "t": 7, "info": "Utrecht 4\u00d7/hour Sprinter \u2192 Amsterdam\u202fCentraal 27\u202fmin \u2022 Nederlandse\u202fSpoorwegen \u2022 \u20ac9.40"}];
+stops.forEach((s,i)=>{
+  const ico=i===0?green:(i===stops.length-1?red:blue);
+  L.marker(s.coords,{icon:ico}).addTo(map)
+   .bindPopup(`<b>${s.name}</b><br>${s.desc}<br><i>Stay:</i> ${s.nights} night${s.nights!==1?'s':''}`);
+});
+legs.forEach(l=>{
+  L.polyline([stops[l.f].coords,stops[l.t].coords],{color:'purple',weight:4})
+   .addTo(map)
+   .bindPopup(`<b>${stops[l.f].name} → ${stops[l.t].name}</b><br>${l.info}`);
+});
+</script>
+</body>
+</html>
