@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Manchester → Amsterdam → Newcastle Rail‑and‑Ferry Adventure</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+  html,body{height:100%;width:100%;margin:0;padding:0;}
+  #map{height:100vh;width:100vw;}
+  .popup-img{display:block;margin:0.3em auto;width:220px;height:140px;object-fit:cover;border-radius:6px;}
+  .popup-title{font-weight:600;font-size:1.1em;margin-bottom:0.2em;}
+</style>
+</head>
+<body>
+<div id="map"></div>
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+(function(){
+ if(typeof L==='undefined'){
+   document.getElementById('map').innerHTML='<p style="padding:1em">⚠️ Map library failed to load – please check your connection.</p>';
+   return;
+ }
+ const stops=[
+   {name:"Manchester (start)",lat:53.48095,lon:-2.23743,desc:`Industrial‑heritage city; Science & Industry Museum, buzzing Northern Quarter.`},
+   {name:"London (St Pancras)",lat:51.529,lon:-0.12565,desc:`Board Eurostar here. British Library treasures next door.`},
+   {name:"Paris (Gare de Lyon)",lat:48.844,lon:2.373,desc:`Transfer from Gare du Nord; optional Seine stroll if schedule allows.`},
+   {name:"Basel",lat:47.55839,lon:7.57327,desc:`Swiss‑French‑German mix on the Rhine; Rathaus, Mittlere Brücke.`},
+   {name:"Lucerne",lat:47.05165,lon:8.30754,desc:`Story‑book Chapel Bridge, Lion Monument, lake & Mt Pilatus panoramas.`},
+   {name:"Munich",lat:48.13743,lon:11.57549,desc:`Historic Marienplatz, Hofbräuhaus beer hall, vast English Garden.`},
+   {name:"Neuschwanstein Castle",lat:47.55773,lon:10.74965,desc:`Fairy‑tale castle of King Ludwig II above Füssen; hike to Marienbrücke for best view.`},
+   {name:"Salzburg",lat:47.79941,lon:13.04399,desc:`Mozart’s baroque Old Town, Hohensalzburg Fortress, Sound‑of‑Music scenery.`},
+   {name:"Eisriesenwelt Ice Cave",lat:47.50167,lon:13.18717,desc:`World’s largest accessible ice cave—massive frozen halls reached by cable car from Werfen.`},
+   {name:"Rothenburg ob der Tauber",lat:49.3789,lon:10.1871,desc:`Best‑preserved medieval walled town; Plönlein corner, Night‑watchman tour.`},
+   {name:"Amsterdam",lat:52.37022,lon:4.89517,desc:`Iconic canals, Van Gogh Museum, Anne Frank House, cycling culture – penultimate stop before the ferry.`},
+   {name:"IJmuiden Ferry Terminal",lat:52.4725,lon:4.5594,desc:`Felison terminal for DFDS overnight ferry to Newcastle.`},
+   {name:"Newcastle",lat:54.96874,lon:-1.61941,desc:`Historic Quayside, castle keep, vibrant cultural scene; arrival port in England.`},
+   {name:"Manchester (finish)",lat:53.48095,lon:-2.23743,desc:`Homeward bound – easy rail from Newcastle.`}
+ ];
+
+ const segments=[
+   {from:0,to:1,dep:"07:15",arr:"09:27",dur:"2 h 10 m",price:"£30"},
+   {from:1,to:2,dep:"12:24",arr:"15:40",dur:"2 h 16 m",price:"£39"},
+   {from:2,to:3,dep:"17:22",arr:"20:23",dur:"3 h",price:"€49"},
+   {from:3,to:4,dep:"21:03",arr:"22:00",dur:"57 m",price:"CHF 15"},
+   {from:4,to:5,dep:"08:54",arr:"13:28",dur:"4 h 34 m",price:"€34"},
+   {from:5,to:6,dep:"09:52",arr:"11:55",dur:"2 h 03 m",price:"€29 (Bayern‑Tkt)"},
+   {from:5,to:7,dep:"09:30",arr:"11:10",dur:"1 h 40 m",price:"€10.50"},
+   {from:7,to:8,dep:"09:15",arr:"09:55",dur:"40 m",price:"€9"},
+   {from:7,to:9,dep:"08:52",arr:"13:45",dur:"4 h 53 m",price:"€29"},
+   {from:9,to:10,dep:"09:06",arr:"17:00",dur:"7 h 54 m",price:"€60 (ICE + IC)"},
+   {from:10,to:11,dep:"15:00",arr:"15:45",dur:"45 m",price:"€6 (bus 396)"},
+   {from:11,to:12,dep:"17:30",arr:"09:15 (+1)",dur:"15 h 45 m",price:"£70 ferry"},
+   {from:12,to:13,dep:"11:00",arr:"13:40",dur:"2 h 40 m",price:"£20 advance"}
+ ];
+
+ const map=L.map('map',{scrollWheelZoom:true}).setView([51,5],5);
+ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap contributors'}).addTo(map);
+
+ const img=q=>`https://source.unsplash.com/400x250/?${encodeURIComponent(q)}`;
+ stops.forEach(s=>{
+  L.marker([s.lat,s.lon]).addTo(map)
+    .bindPopup(`<div class='popup-title'>${s.name}</div><img class='popup-img' src='${img(s.name)}'><div>${s.desc}</div>`);
+ });
+ segments.forEach(seg=>{
+  const a=stops[seg.from], b=stops[seg.to];
+  const color=seg.price.includes('ferry')?'#ff7800':'#3388ff';
+  L.polyline([[a.lat,a.lon],[b.lat,b.lon]],{weight:3,opacity:0.85,color})
+    .addTo(map)
+    .bindPopup(`<b>${a.name} → ${b.name}</b><br>Dep&nbsp;${seg.dep}<br>Arr&nbsp;${seg.arr}<br>Duration&nbsp;${seg.dur}<br>Price&nbsp;${seg.price}`);
+ });
+})();
+</script>
+</body>
+</html>
+
