@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Interactive UK Map – Points of Interest by Type</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    html, body, #map { height: 100%; margin: 0; }
+    .legend {
+      background: #fff;
+      line-height: 1.5em;
+      padding: 6px 8px;
+      border-radius: 5px;
+      box-shadow: 0 0 4px rgba(0,0,0,0.25);
+      font: 14px/1.3 "Helvetica Neue", Arial, Helvetica, sans-serif;
+    }
+    .legend span { display:inline-block; width:12px; height:12px; margin-right:6px; }
+  </style>
+</head>
+<body>
+  <div id="map" role="region" aria-label="Interactive map of UK points of interest"></div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    (function(){
+      function init(){
+        if(typeof L==='undefined'){
+          document.body.innerHTML='<p style="color:red;padding:1rem;font-family:sans-serif">Leaflet failed to load – check your internet connection or any content‑security policy.</p>';
+          return;
+        }
+
+        const map=L.map('map',{zoomControl:true}).setView([55.5,-4],6);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+          maxZoom:18,
+          attribution:'&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        // helper for coloured marker icons
+        function colouredIcon(color){
+          return new L.Icon({
+            iconUrl:`https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${color}.png`,
+            shadowUrl:'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-shadow.png',
+            iconSize:[25,41],
+            iconAnchor:[12,41],
+            popupAnchor:[1,-34],
+            shadowSize:[41,41]
+          });
+        }
+
+        // icon palette
+        const icons={
+          scenic:colouredIcon('green'),
+          waterfall:colouredIcon('blue'),
+          castle:colouredIcon('red'),
+          attraction:colouredIcon('orange')
+        };
+
+        // layers per category
+        const layers={
+          'Scenic Walks':L.layerGroup().addTo(map),
+          'Waterfalls':L.layerGroup().addTo(map),
+          'Castles':L.layerGroup().addTo(map),
+          'Attractions':L.layerGroup().addTo(map)
+        };
+
+        // data points
+        const points=[
+          // Scenic Walks (green)
+          {layer:'Scenic Walks',coords:[54.567,-3.181],title:'Catbells Walk',desc:'Classic ridge walk above Derwentwater (Lake District).'},
+          {layer:'Scenic Walks',coords:[54.527,-3.016],title:'Helvellyn via Striding Edge',desc:'Iconic scramble to England’s third‑highest peak.'},
+          {layer:'Scenic Walks',coords:[54.454,-3.211],title:'Scafell Pike Summit',desc:'Highest mountain in England with 360° views.'},
+          {layer:'Scenic Walks',coords:[55.944,-3.161],title:'Arthur’s Seat',desc:'Extinct volcano with panoramic views of Edinburgh.'},
+          {layer:'Scenic Walks',coords:[56.085,-4.537],title:'Conic Hill, Loch Lomond',desc:'Short climb to ridge on the Highland Boundary Fault.'},
+          {layer:'Scenic Walks',coords:[56.190,-4.817],title:'The Cobbler (Ben Arthur)',desc:'Distinctive triple‑summit popular with hikers.'},
+          {layer:'Scenic Walks',coords:[56.683,-5.102],title:'Glen Coe Valley',desc:'Dramatic glen with countless routes.'},
+          {layer:'Scenic Walks',coords:[54.425,-3.006],title:'Loughrigg Fell',desc:'Friendly fell with superb views of Windermere & Grasmere.'},
+          {layer:'Scenic Walks',coords:[56.189,-4.633],title:'Ben Lomond',desc:'Most southerly Munro; well‑trodden summit path.'},
+          {layer:'Scenic Walks',coords:[57.593,-6.158],title:'Fairy Glen, Skye',desc:'Spooky cone‑shaped hills and short circular walk.'},
+
+          // Waterfalls (blue)
+          {layer:'Waterfalls',coords:[54.598,-2.952],title:'Aira Force',desc:'65‑ft waterfall in ancient woodland.'},
+          {layer:'Waterfalls',coords:[54.430,-2.962],title:'Stock Ghyll Force',desc:'Picturesque 70‑ft cascade near Ambleside.'},
+          {layer:'Waterfalls',coords:[55.327,-3.266],title:'Grey Mare’s Tail',desc:'Impressive 60 m fall in a hanging valley.'},
+          {layer:'Waterfalls',coords:[56.468,-4.318],title:'Falls of Dochart',desc:'Series of cataracts through Killin village.'},
+          {layer:'Waterfalls',coords:[56.796,-5.019],title:'Steall Falls',desc:'One of Scotland’s highest waterfalls; dramatic gorge walk.'},
+          {layer:'Waterfalls',coords:[54.174,-2.463],title:'Ingleton Waterfalls Trail',desc:'Circular trail visiting Thornton Force & more cascades.'},
+          {layer:'Waterfalls',coords:[57.282,-4.638],title:'Plodda Falls',desc:'46‑m plunge in Glen Affric forest.'},
+          {layer:'Waterfalls',coords:[57.972,-4.414],title:'Falls of Shin',desc:'Salmon‑leaping fall in Sutherland.'},
+          {layer:'Waterfalls',coords:[56.718,-4.465],title:'Falls of Bruar',desc:'Twin falls framed by scenic woodland gorge.'},
+
+          // Castles (red)
+          {layer:'Castles',coords:[54.355,-3.357],title:'Muncaster Castle',desc:'Haunted historic home with gardens.'},
+          {layer:'Castles',coords:[55.9486,-3.200],title:'Edinburgh Castle',desc:'Iconic fortress on Castle Rock.'},
+          {layer:'Castles',coords:[56.123,-3.946],title:'Stirling Castle',desc:'Key royal castle with Renaissance palace.'},
+          {layer:'Castles',coords:[56.948,-2.199],title:'Dunnottar Castle',desc:'Dramatic cliff‑top ruins.'},
+          {layer:'Castles',coords:[57.274,-5.516],title:'Eilean Donan Castle',desc:'Photogenic island castle.'},
+          {layer:'Castles',coords:[56.452,-4.286],title:'Urquhart Castle',desc:'Loch Ness ruins rich in history.'},
+          {layer:'Castles',coords:[56.235,-5.076],title:'Inveraray Castle',desc:'Gothic Revival home of the Duke of Argyll.'},
+          {layer:'Castles',coords:[56.410,-3.866],title:'Scone Palace',desc:'Historic crowning place of Scottish kings.'},
+          {layer:'Castles',coords:[56.775,-3.960],title:'Blair Castle',desc:'White‑walled Baronial seat of the Dukes of Atholl.'},
+          {layer:'Castles',coords:[56.944,-3.208],title:'Balmoral Castle',desc:'Royal residence in Cairngorms National Park.'},
+
+          // Attractions (orange)
+          {layer:'Attractions',coords:[54.362,-2.929],title:'Windermere Lake Cruises',desc:'Sightseeing boats on England’s largest lake.'},
+          {layer:'Attractions',coords:[55.980,-3.175],title:'Royal Yacht Britannia',desc:'Former royal yacht, now museum.'},
+          {layer:'Attractions',coords:[56.020,-3.750],title:'The Kelpies',desc:'30‑m steel horse‑head sculptures.'},
+          {layer:'Attractions',coords:[56.000,-3.841],title:'Falkirk Wheel',desc:'Revolutionary rotating boat lift.'},
+          {layer:'Attractions',coords:[55.858,-4.293],title:'Glasgow Science Centre',desc:'Interactive science & space exhibits.'},
+          {layer:'Attractions',coords:[54.636,-2.800],title:'Rheged Centre',desc:'Underground arts & heritage venue in Cumbria.'},
+          {layer:'Attractions',coords:[55.953,-3.188],title:'Scott Monument',desc:'Gothic spire honouring Sir Walter Scott.'}
+        ];
+
+        // add all points
+        points.forEach(p=>{
+          // derive category key (singular) for icon lookup
+          let key=p.layer.split(' ')[0].toLowerCase();
+          if(key.endsWith('s')) key=key.slice(0,-1); // Waterfalls -> waterfall, Castles -> castle
+          const icon=icons[key]||icons.attraction;
+          const marker=L.marker(p.coords,{icon}).bindPopup(`<b>${p.title}</b><br>${p.desc}`);
+          layers[p.layer].addLayer(marker);
+        });
+
+        // layer toggle
+        L.control.layers(null,layers,{collapsed:false}).addTo(map);
+
+        // fit map to markers
+        const fg=L.featureGroup(Object.values(layers));
+        if(fg.getBounds().isValid()) map.fitBounds(fg.getBounds().pad(0.1));
+
+        // legend
+        const legend=L.control({position:'bottomright'});
+        legend.onAdd=()=>{
+          const div=L.DomUtil.create('div','legend');
+          div.innerHTML='<b>Key</b><br>'+
+            '<span style="background:green"></span> Scenic walk<br>'+
+            '<span style="background:blue"></span> Waterfall<br>'+
+            '<span style="background:red"></span> Castle<br>'+
+            '<span style="background:orange"></span> Attraction';
+          return div;
+        };
+        legend.addTo(map);
+      }
+
+      if(document.readyState==='loading'){
+        document.addEventListener('DOMContentLoaded',init);
+      }else{init();}
+    })();
+  </script>
+</body>
+</html>
+
